@@ -1,8 +1,45 @@
 import { useRef } from 'react';
 import VideoJS from './videojs';
+import { Channels, Events } from '../../../types/message';
 
-export default function Player() {
+interface IPlayerProps {
+  onUpdateSelect: (selectedValue: boolean) => void;
+  selectedVideo: boolean;
+}
+
+function VideoBox(
+  selectedVideo: boolean,
+  videoJsOptions: any,
+  handlePlayerReady: any,
+) {
+  return selectedVideo ? (
+    <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
+  ) : (
+    <div className="w-full aspect-video bg-black">&nbsp;</div>
+  );
+}
+
+export default function Player({
+  selectedVideo,
+  onUpdateSelect,
+}: IPlayerProps) {
   const playerRef = useRef(null);
+
+  // const [filePath, setFilePath] = useState(null);
+
+  // calling IPC exposed from preload script
+  window.electron.ipcRenderer.on(Events.DialogOpenFile, () => {
+    // eslint-disable-next-line no-console
+    // setFilePath(arg.message);
+    onUpdateSelect(true);
+  });
+
+  function handleClick(): void {
+    window.electron.ipcRenderer.sendMessage(
+      Channels.IPC,
+      Events.DialogOpenFile,
+    );
+  }
 
   const videoJsOptions = {
     autoplay: true,
@@ -42,5 +79,20 @@ export default function Player() {
     // });
   };
 
-  return <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />;
+  return (
+    <>
+      <VideoBox
+        selectedVideo={selectedVideo}
+        videoJsOptions={videoJsOptions}
+        handlePlayerReady={handlePlayerReady}
+      />
+      <button
+        type="button"
+        className="bg-indigo-600 text-white text-sm leading-6 font-medium py-2 px-3 rounded-lg"
+        onClick={handleClick}
+      >
+        onselect VideoJS
+      </button>
+    </>
+  );
 }

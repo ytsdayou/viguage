@@ -50,8 +50,8 @@ export default function VideoJS(props: VideoProps) {
   }, [playerRef]);
 
   return (
-    <div data-vjs-player>
-      <div ref={videoRef} />
+    <div className="w-full player-container" data-vjs-player>
+      <div className="w-full bg-black" ref={videoRef} />
     </div>
   );
 }
