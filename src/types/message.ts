@@ -12,7 +12,8 @@ export type MsgResult = {
 };
 export enum Events {
   FileInfo = 'fileinfo',
-  DialogOpenFile = 'dialog-open-file',
+  DialogOpenFile = 'dialog-open-file', // video file
+  DialogOpenSubtitle = 'dialog-open-subtitle', // subtitle file
 }
 export enum Channels {
   IPC = 'ipc-channel',

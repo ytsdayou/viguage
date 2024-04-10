@@ -31,31 +31,44 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-// streamVideo(path.join(__dirname, 'mp4', 'sample.mp4'));
+ipcMain.on('ipc-channel', async (event, arg: Events) => {
+  if (
+    typeof arg === 'string' &&
+    [Events.DialogOpenFile, Events.DialogOpenSubtitle].indexOf(arg) > -1
+  ) {
+    const dialogName = new Map();
+    dialogName.set(Events.DialogOpenFile, 'Video Files');
+    dialogName.set(Events.DialogOpenSubtitle, 'Subtitle Files');
 
-ipcMain.on('ipc-channel', async (event, arg) => {
-  if (arg === Events.DialogOpenFile) {
+    const dialogExten = new Map();
+    dialogExten.set(Events.DialogOpenFile, ['mp4', 'ogg', 'webm']);
+    dialogExten.set(Events.DialogOpenSubtitle, ['srt', 'ass', 'vtt']);
+
     dialog
       .showOpenDialog(mainWindow as BrowserWindow, {
         properties: ['openFile'],
-        filters: [{ name: 'Video Files', extensions: ['mp4', 'ogg', 'webm'] }],
+        filters: [
+          { name: dialogName.get(arg), extensions: dialogExten.get(arg) },
+        ],
       })
       .then((res) => {
         if (res.canceled) {
-          event.reply(Events.DialogOpenFile, {
+          event.reply(arg, {
             status: MsgStatus.ERROR,
             message: 'user cancel',
           });
-        } else {
+        } else if (Events.DialogOpenFile === arg) {
           streamVideo(res.filePaths[0]);
-          event.reply(Events.DialogOpenFile, {
+          event.reply(arg, {
             status: MsgStatus.SUCC,
             message: res.filePaths,
           });
+        } else if (Events.DialogOpenSubtitle === arg) {
+          event.reply(arg, ParseSubtitle(res.filePaths[0]));
         }
       })
       .catch((err) => {
-        event.reply(Events.DialogOpenFile, {
+        event.reply(arg, {
           status: MsgStatus.ERROR,
           message: `open dialog err: ${err}`,
         });
@@ -149,8 +162,6 @@ const createWindow = async () => {
   // eslint-disable-next-line
   new AppUpdater();
 };
-
-ParseSubtitle('c:\\CHSEN_typescript+2.srt');
 
 /**
  * Add event listeners...
