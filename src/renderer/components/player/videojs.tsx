@@ -32,8 +32,9 @@ export default function VideoJS(props: VideoProps) {
     } else {
       player = playerRef.current;
 
-      player.autoplay(options.autoplay);
       player.src(options.sources);
+      player.load();
+      player.play();
     }
   }, [onReady, options, videoRef]);
 

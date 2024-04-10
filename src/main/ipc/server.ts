@@ -83,7 +83,7 @@ export function startVideoServer(port: number, videoPath: string): void {
   try {
     serveVideo(port, videoPath);
   } catch (error) {
-    // console.log('server start error:', error);
+    console.log('server start error:', error);
   }
 }
 
@@ -97,5 +97,7 @@ export function stopVideoServer(): void {
 export function streamVideo(newVideoPath: string): void {
   const port = 3000;
   stopVideoServer(); // Stop the current server
-  startVideoServer(port, newVideoPath); // Start the server with the new video path
+  setTimeout(() => {
+    startVideoServer(port, newVideoPath); // Start the server with the new video path
+  }, 500);
 }

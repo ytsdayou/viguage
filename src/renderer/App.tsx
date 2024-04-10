@@ -3,7 +3,7 @@ import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './page/home';
 // import { Events, MsgData, Channels } from '../types/message';
 import './App.css';
-import '../index.css';
+import './index.css';
 
 // function App() {
 //   const [filePath, setFilePath] = useState(null);

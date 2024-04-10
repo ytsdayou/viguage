@@ -1,22 +1,10 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import VideoJS from './videojs';
-import { Channels, Events } from '../../../types/message';
+import { Channels, Events, MsgStatus } from '../../../types/message';
 
 interface IPlayerProps {
   onUpdateSelect: (selectedValue: boolean) => void;
   selectedVideo: boolean;
-}
-
-function VideoBox(
-  selectedVideo: boolean,
-  videoJsOptions: any,
-  handlePlayerReady: any,
-) {
-  return selectedVideo ? (
-    <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
-  ) : (
-    <div className="w-full aspect-video bg-black">&nbsp;</div>
-  );
 }
 
 export default function Player({
@@ -24,14 +12,27 @@ export default function Player({
   onUpdateSelect,
 }: IPlayerProps) {
   const playerRef = useRef(null);
-
-  // const [filePath, setFilePath] = useState(null);
+  const [videoJsOptions, setVideoJsOptions] = useState({});
 
   // calling IPC exposed from preload script
-  window.electron.ipcRenderer.on(Events.DialogOpenFile, () => {
-    // eslint-disable-next-line no-console
-    // setFilePath(arg.message);
-    onUpdateSelect(true);
+  window.electron.ipcRenderer.on(Events.DialogOpenFile, (e) => {
+    if (e.status === MsgStatus.SUCC) {
+      onUpdateSelect(false);
+      setVideoJsOptions({
+        autoplay: true,
+        controls: true,
+        responsive: true,
+        fluid: true,
+        seeking: true,
+        sources: [
+          {
+            src: `http://localhost:3000/video?t=${new Date().getTime()}`,
+            type: 'video/mp4',
+          },
+        ],
+      });
+      onUpdateSelect(true);
+    }
   });
 
   function handleClick(): void {
@@ -40,20 +41,6 @@ export default function Player({
       Events.DialogOpenFile,
     );
   }
-
-  const videoJsOptions = {
-    autoplay: true,
-    controls: true,
-    responsive: true,
-    fluid: true,
-    seeking: true,
-    sources: [
-      {
-        src: `http://localhost:3000/video?t=${new Date().getTime()}`,
-        type: 'video/mp4',
-      },
-    ],
-  };
 
   const handlePlayerReady = (player: any): void => {
     playerRef.current = player;
@@ -79,19 +66,25 @@ export default function Player({
     // });
   };
 
+  const playerBox = () => {
+    return selectedVideo ? (
+      <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
+    ) : (
+      <div className="w-full aspect-video bg-black text-xs flex items-center justify-center">
+        Please select a video file!
+      </div>
+    );
+  };
+
   return (
     <>
-      <VideoBox
-        selectedVideo={selectedVideo}
-        videoJsOptions={videoJsOptions}
-        handlePlayerReady={handlePlayerReady}
-      />
+      {playerBox()}
       <button
         type="button"
-        className="bg-indigo-600 text-white text-sm leading-6 font-medium py-2 px-3 rounded-lg"
+        className="bg-indigo-600 text-white text-xs leading-6 font-medium py-1 px-2 rounded-lg mt-3"
         onClick={handleClick}
       >
-        onselect VideoJS
+        Select Video
       </button>
     </>
   );

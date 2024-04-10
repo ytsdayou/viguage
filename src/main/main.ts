@@ -17,6 +17,7 @@ import { resolveHtmlPath } from './util';
 import { msgHandle } from './ipc/handle';
 import { Events, MsgStatus } from '../types/message';
 import { streamVideo } from './ipc/server';
+import ParseSubtitle from './ipc/subtitle';
 
 const { dialog } = require('electron');
 
@@ -148,6 +149,8 @@ const createWindow = async () => {
   // eslint-disable-next-line
   new AppUpdater();
 };
+
+ParseSubtitle('c:\\CHSEN_typescript+2.srt');
 
 /**
  * Add event listeners...
