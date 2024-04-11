@@ -41,7 +41,7 @@ ipcMain.on('ipc-channel', async (event, arg: Events) => {
     dialogName.set(Events.DialogOpenSubtitle, 'Subtitle Files');
 
     const dialogExten = new Map();
-    dialogExten.set(Events.DialogOpenFile, ['mp4', 'ogg', 'webm']);
+    dialogExten.set(Events.DialogOpenFile, ['mp4']);
     dialogExten.set(Events.DialogOpenSubtitle, ['srt', 'ass', 'vtt']);
 
     dialog
@@ -65,6 +65,11 @@ ipcMain.on('ipc-channel', async (event, arg: Events) => {
           });
         } else if (Events.DialogOpenSubtitle === arg) {
           event.reply(arg, ParseSubtitle(res.filePaths[0]));
+        } else {
+          event.reply(arg, {
+            status: MsgStatus.ERROR,
+            message: 'unexpected error',
+          });
         }
       })
       .catch((err) => {

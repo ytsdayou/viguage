@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.vll-btn {
+  @apply bg-gray-200 text-gray-800 text-xs leading-6 font-medium py-1 px-2 rounded hover:opacity-80;
+}

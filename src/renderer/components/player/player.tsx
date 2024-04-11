@@ -5,11 +5,13 @@ import { Channels, Events, MsgStatus } from '../../../types/message';
 interface IPlayerProps {
   onUpdateSelect: (selectedValue: boolean) => void;
   selectedVideo: boolean;
+  onUpdateIndex: () => void;
 }
 
 export default function Player({
   selectedVideo,
   onUpdateSelect,
+  onUpdateIndex,
 }: IPlayerProps) {
   const playerRef = useRef(null);
   const [videoJsOptions, setVideoJsOptions] = useState({});
@@ -70,8 +72,8 @@ export default function Player({
     return selectedVideo ? (
       <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
     ) : (
-      <div className="w-full aspect-video bg-black text-xs flex items-center justify-center">
-        Please select a video file!
+      <div className="w-full aspect-video bg-black text-xs text-white flex items-center justify-center">
+        Please click the button below to select a video file!
       </div>
     );
   };
@@ -79,12 +81,11 @@ export default function Player({
   return (
     <>
       {playerBox()}
-      <button
-        type="button"
-        className="bg-indigo-600 text-white text-xs leading-6 font-medium py-1 px-2 rounded-lg mt-3"
-        onClick={handleClick}
-      >
+      <button type="button" className="vll-btn mt-3" onClick={handleClick}>
         Select Video
+      </button>
+      <button type="button" className="vll-btn mt-3" onClick={onUpdateIndex}>
+        add
       </button>
     </>
   );
