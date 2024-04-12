@@ -130,7 +130,6 @@ const createWindow = async () => {
     height,
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      allowRunningInsecureContent: true,
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),

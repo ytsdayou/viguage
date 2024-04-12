@@ -1,20 +1,21 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import VideoJS from './videojs';
 import { Channels, Events, MsgStatus } from '../../../types/message';
+import { useAppDispatch } from '../../libs/hooks';
+import { setPlayTime } from '../../libs/reducers/playTimeSlice';
 
 interface IPlayerProps {
   onUpdateSelect: (selectedValue: boolean) => void;
   selectedVideo: boolean;
-  onUpdateIndex: () => void;
 }
 
 export default function Player({
   selectedVideo,
   onUpdateSelect,
-  onUpdateIndex,
 }: IPlayerProps) {
-  const playerRef = useRef(null);
+  const playerRef = useRef<any>(null);
   const [videoJsOptions, setVideoJsOptions] = useState({});
+  const dispatch = useAppDispatch();
 
   // calling IPC exposed from preload script
   window.electron.ipcRenderer.on(Events.DialogOpenFile, (e) => {
@@ -33,6 +34,7 @@ export default function Player({
           },
         ],
       });
+      dispatch(setPlayTime(0));
       onUpdateSelect(true);
     }
   });
@@ -68,6 +70,16 @@ export default function Player({
     // });
   };
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (playerRef && playerRef.current && playerRef.current.currentTime) {
+        dispatch(setPlayTime(playerRef.current.currentTime()));
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [dispatch]);
+
   const playerBox = () => {
     return selectedVideo ? (
       <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
@@ -83,9 +95,6 @@ export default function Player({
       {playerBox()}
       <button type="button" className="vll-btn mt-3" onClick={handleClick}>
         Select Video
-      </button>
-      <button type="button" className="vll-btn mt-3" onClick={onUpdateIndex}>
-        add
       </button>
     </>
   );
