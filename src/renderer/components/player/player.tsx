@@ -1,12 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import VideoJS from './videojs';
 import { Channels, Events, MsgStatus } from '../../../types/message';
-import { useAppDispatch } from '../../libs/hooks';
+import { useAppDispatch, useAppSelector } from '../../libs/hooks';
 import { setPlayTime } from '../../libs/reducers/playTimeSlice';
+import { selectRepeat } from '../../libs/reducers/repeatSlice';
+// import { RepeatProps } from '../../../types/video';
 
 interface IPlayerProps {
-  onUpdateSelect: (selectedValue: boolean) => void;
+  onUpdateSelect: (selectedValue: boolean) => undefined;
   selectedVideo: boolean;
+}
+
+function handleClick(): undefined {
+  window.electron.ipcRenderer.sendMessage(Channels.IPC, Events.DialogOpenFile);
 }
 
 export default function Player({
@@ -16,6 +22,7 @@ export default function Player({
   const playerRef = useRef<any>(null);
   const [videoJsOptions, setVideoJsOptions] = useState({});
   const dispatch = useAppDispatch();
+  const repeat = useAppSelector(selectRepeat);
 
   // calling IPC exposed from preload script
   window.electron.ipcRenderer.on(Events.DialogOpenFile, (e) => {
@@ -39,14 +46,7 @@ export default function Player({
     }
   });
 
-  function handleClick(): void {
-    window.electron.ipcRenderer.sendMessage(
-      Channels.IPC,
-      Events.DialogOpenFile,
-    );
-  }
-
-  const handlePlayerReady = (player: any): void => {
+  const handlePlayerReady = useCallback((player: any): undefined => {
     playerRef.current = player;
 
     // You can handle player events here, for example:
@@ -57,18 +57,7 @@ export default function Player({
     player.on('dispose', () => {
       // console.log('player will dispose');
     });
-
-    // player.on('timeupdate', () => {
-    //   const currentTime = player.currentTime();
-
-    //   const loopStart = 10; // seconds
-    //   const loopEnd = 20; // seconds
-
-    //   if (currentTime < loopStart || currentTime > loopEnd) {
-    //     player.currentTime(loopStart);
-    //   }
-    // });
-  };
+  }, []);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -82,7 +71,11 @@ export default function Player({
 
   const playerBox = () => {
     return selectedVideo ? (
-      <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
+      <VideoJS
+        options={videoJsOptions}
+        onReady={handlePlayerReady}
+        repeat={repeat}
+      />
     ) : (
       <div className="w-full aspect-video bg-black text-xs text-white flex items-center justify-center">
         Please click the button below to select a video file!
@@ -96,6 +89,7 @@ export default function Player({
       <button type="button" className="vll-btn mt-3" onClick={handleClick}>
         Select Video
       </button>
+      {repeat.count}
     </>
   );
 }

@@ -1,10 +1,12 @@
+/* eslint-disable import/no-cycle */
 import { configureStore } from '@reduxjs/toolkit';
-// eslint-disable-next-line import/no-cycle
 import playTimeReducer from './reducers/playTimeSlice';
+import repeatRediucer from './reducers/repeatSlice';
 
 export const store = configureStore({
   reducer: {
     playTime: playTimeReducer,
+    repeat: repeatRediucer,
   },
 });
 

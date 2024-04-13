@@ -1,19 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
-// import { ArrowRight } from 'react-bootstrap-icons';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Channels, Events, MsgStatus } from '../../../types/message';
-import { useAppSelector } from '../../libs/hooks';
+import { useAppDispatch, useAppSelector } from '../../libs/hooks';
 import { selectPlayTime } from '../../libs/reducers/playTimeSlice';
 import { convertSubtitleTimeToPlayerTime } from '../../libs/tools';
+// import { RepeatProps } from '../../../types/video';
 import './List.module.css';
+import { RepeatProps } from '../../../types/video';
+import { setRepeat } from '../../libs/reducers/repeatSlice';
 
-function handleClick(): void {
+function handleClick(): undefined {
   window.electron.ipcRenderer.sendMessage(
     Channels.IPC,
     Events.DialogOpenSubtitle,
   );
 }
 
-function listenSelectSubtitle(onUpdateSubtitle: (subtitle: []) => void): void {
+function listenSelectSubtitle(
+  onUpdateSubtitle: (subtitle: []) => undefined,
+): undefined {
   window.electron.ipcRenderer.on(Events.DialogOpenSubtitle, (e) => {
     if (e.status === MsgStatus.SUCC) {
       onUpdateSubtitle(e.message);
@@ -21,23 +25,37 @@ function listenSelectSubtitle(onUpdateSubtitle: (subtitle: []) => void): void {
   });
 }
 
+const createRepeatProps = (
+  count: number,
+  startTime: number,
+  endTime: number,
+): RepeatProps => {
+  return {
+    count,
+    begin: startTime,
+    end: endTime,
+  };
+};
+
 const listWrapper = (
   subtitles: Array<Array<string>>,
   playTime: number,
   activeId: number,
-  onUpdateActive: (id: number) => void,
+  onUpdateActive: (id: number) => undefined,
+  onUpdateRepeat: (count: number, begin: number, end: number) => void,
 ) => {
   const listContent = subtitles.map((val: string[], i: number) => {
     if ([3, 4].indexOf(val.length) > -1) {
       const [start, end] = val[1].split(' --> ');
+      const startTime = convertSubtitleTimeToPlayerTime(start);
+      const endTime = convertSubtitleTimeToPlayerTime(end);
+
       const text = val[3] ? [val[2], val[3]] : [val[2]];
       const textWrapper = text.map((textRow: string, index: number) => {
         return <div key={`${val[0]}_${index.toString()}`}>{textRow}</div>;
       });
 
-      const activeFlag =
-        playTime > convertSubtitleTimeToPlayerTime(start) &&
-        playTime < convertSubtitleTimeToPlayerTime(end);
+      const activeFlag = playTime > startTime && playTime < endTime;
       if (activeFlag && activeId !== Number(val[0])) {
         onUpdateActive(Number(val[0]));
       }
@@ -52,6 +70,8 @@ const listWrapper = (
         textCss += ' text-blue-600';
       }
 
+      // const rp1 = createRepeatProps(1, startTime, endTime);
+
       return (
         <div className={rowCss} key={Number(val[0])}>
           <div className="row-left flex flex-col justify-between gap-y-5 px-4">
@@ -60,8 +80,15 @@ const listWrapper = (
           </div>
           <div className={textCss}>{textWrapper}</div>
           <div className="absolute opt top-6 right-6 flex flex-col invisible group-hover/item:visible">
-            <span className="bi bi-play-btn">&nbsp;</span>
-            <span className="bi bi-repeat">&nbsp;</span>
+            <button
+              type="button"
+              onClick={() => onUpdateRepeat(1, startTime, endTime)}
+            >
+              <i className="bi bi-play-btn" />
+            </button>
+            <button type="button" onClick={handleClick}>
+              <i className="bi bi-repeat" />
+            </button>
           </div>
         </div>
       );
@@ -77,15 +104,24 @@ export default function List() {
   const [subtitles, setSubtitles] = useState([]);
   const [activeId, setActiveId] = useState(0);
   const listRef = useRef<any>(null);
+  const dispatch = useAppDispatch();
   const playTime = useAppSelector(selectPlayTime);
 
-  const onUpdateActive = (id: number): void => {
+  const onUpdateActive = (id: number): undefined => {
     setActiveId(id);
   };
 
-  const onUpdateSubtitle = (sub: []): void => {
+  const onUpdateSubtitle = (sub: []): undefined => {
     setSubtitles(sub);
   };
+
+  const onUpdateRepeat = useCallback(
+    (count: number, startTime: number, endTime: number) => {
+      const repeatProps = createRepeatProps(count, startTime, endTime);
+      dispatch(setRepeat(repeatProps));
+    },
+    [dispatch],
+  );
 
   useEffect(() => {
     listenSelectSubtitle(onUpdateSubtitle);
@@ -109,7 +145,13 @@ export default function List() {
       </div>
       {subtitles.length > 0 ? (
         <div ref={listRef} className="overflow-auto">
-          {listWrapper(subtitles, playTime, activeId, onUpdateActive)}
+          {listWrapper(
+            subtitles,
+            playTime,
+            activeId,
+            onUpdateActive,
+            onUpdateRepeat,
+          )}
         </div>
       ) : (
         <div className="flex-grow flex items-center justify-center text-xs text-slate-500">

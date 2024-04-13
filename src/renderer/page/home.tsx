@@ -5,7 +5,7 @@ import Subtitle from '../components/subtitle/list';
 export default function Home() {
   const [selectedVideo, setSelectedVideo] = useState(false);
 
-  const handleSelectVideo = (flag: boolean) => {
+  const handleSelectVideo = (flag: boolean): undefined => {
     setSelectedVideo(flag);
   };
 
