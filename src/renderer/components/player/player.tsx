@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import VideoJS from './videojs';
 import { Channels, Events, MsgStatus } from '../../../types/message';
 import { useAppDispatch, useAppSelector } from '../../libs/hooks';
 import { setPlayTime } from '../../libs/reducers/playTimeSlice';
 import { selectRepeat } from '../../libs/reducers/repeatSlice';
-// import { RepeatProps } from '../../../types/video';
+import { CallbackObject } from '../../../types/video';
 
 interface IPlayerProps {
   onUpdateSelect: (selectedValue: boolean) => undefined;
@@ -24,29 +24,7 @@ export default function Player({
   const dispatch = useAppDispatch();
   const repeat = useAppSelector(selectRepeat);
 
-  // calling IPC exposed from preload script
-  window.electron.ipcRenderer.on(Events.DialogOpenFile, (e) => {
-    if (e.status === MsgStatus.SUCC) {
-      onUpdateSelect(false);
-      setVideoJsOptions({
-        autoplay: true,
-        controls: true,
-        responsive: true,
-        fluid: true,
-        seeking: true,
-        sources: [
-          {
-            src: `http://localhost:3000/video?t=${new Date().getTime()}`,
-            type: 'video/mp4',
-          },
-        ],
-      });
-      dispatch(setPlayTime(0));
-      onUpdateSelect(true);
-    }
-  });
-
-  const handlePlayerReady = useCallback((player: any): undefined => {
+  const handlePlayerReady = (player: any): undefined => {
     playerRef.current = player;
 
     // You can handle player events here, for example:
@@ -57,14 +35,51 @@ export default function Player({
     player.on('dispose', () => {
       // console.log('player will dispose');
     });
-  }, []);
+  };
+
+  const playerListener: CallbackObject = {
+    timeupdate: (player: any) => {
+      const currentTime = player.currentTime();
+      if (
+        repeat.count > 0 &&
+        currentTime &&
+        (currentTime < repeat.begin || currentTime > repeat.end)
+      ) {
+        player.currentTime(repeat.begin);
+      }
+    },
+  };
+
+  useEffect(() => {
+    // calling IPC exposed from preload script
+    window.electron.ipcRenderer.on(Events.DialogOpenFile, (e) => {
+      if (e.status === MsgStatus.SUCC) {
+        onUpdateSelect(false);
+        setVideoJsOptions({
+          autoplay: true,
+          controls: true,
+          responsive: true,
+          fluid: true,
+          seeking: true,
+          sources: [
+            {
+              src: `http://localhost:3000/video?t=${new Date().getTime()}`,
+              type: 'video/mp4',
+            },
+          ],
+        });
+        dispatch(setPlayTime(0));
+        onUpdateSelect(true);
+      }
+    });
+  }, [dispatch, onUpdateSelect]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       if (playerRef && playerRef.current && playerRef.current.currentTime) {
         dispatch(setPlayTime(playerRef.current.currentTime()));
       }
-    }, 1000);
+    }, 100);
 
     return () => clearInterval(intervalId);
   }, [dispatch]);
@@ -75,6 +90,7 @@ export default function Player({
         options={videoJsOptions}
         onReady={handlePlayerReady}
         repeat={repeat}
+        playerListener={playerListener}
       />
     ) : (
       <div className="w-full aspect-video bg-black text-xs text-white flex items-center justify-center">

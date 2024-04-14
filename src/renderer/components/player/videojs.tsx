@@ -1,16 +1,16 @@
 import React from 'react';
 import videojs from 'video.js';
-import Player from 'video.js/dist/types/player';
+// import Player from 'video.js/dist/types/player';
 import 'video.js/dist/video-js.css';
 import { VideoProps } from '../../../types/video';
 
 export default function VideoJS(props: VideoProps) {
   const videoRef = React.useRef<HTMLDivElement>(null);
   const playerRef = React.useRef<any>(null);
-  const { options, onReady, repeat } = props;
+  const { options, onReady, repeat, playerListener } = props;
 
   React.useEffect(() => {
-    let player: Player;
+    let player: any;
     // Make sure Video.js player is only initialized once
     if (!playerRef.current) {
       const videoElement = document.createElement('video-js');
@@ -32,24 +32,34 @@ export default function VideoJS(props: VideoProps) {
       player = playerRef.current;
 
       player.src(options.sources);
+
+      // player.off('timeupdate');
+      // player.on('timeupdate', () => {
+      //   const currentTime = player.currentTime();
+
+      //   if (
+      //     repeat.count > 0 &&
+      //     currentTime &&
+      //     (currentTime < repeat.begin || currentTime > repeat.end)
+      //   ) {
+      //     player.currentTime(repeat.begin);
+      //   }
+      // });
+      // playerListener.
+      Object.entries(playerListener).forEach((element: any) => {
+        const [eventName, callback] = element;
+        if (eventName !== 'click') {
+          player.off(eventName);
+          player.on(eventName, (e: any) => {
+            callback(player, e);
+          });
+        }
+      });
+
       player.load();
       player.play();
     }
-
-    console.log(repeat);
-    player.on('timeupdate', () => {
-      const currentTime = player.currentTime();
-
-      if (
-        repeat.count > 0 &&
-        currentTime &&
-        (currentTime < repeat.begin || currentTime > repeat.end)
-      ) {
-        console.log(currentTime);
-        player.currentTime(repeat.begin);
-      }
-    });
-  }, [onReady, options, repeat, videoRef]);
+  }, [onReady, options, playerListener, repeat, videoRef]);
 
   // Dispose the Video.js player when the functional component unmounts
   React.useEffect(() => {

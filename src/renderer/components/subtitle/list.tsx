@@ -3,10 +3,9 @@ import { Channels, Events, MsgStatus } from '../../../types/message';
 import { useAppDispatch, useAppSelector } from '../../libs/hooks';
 import { selectPlayTime } from '../../libs/reducers/playTimeSlice';
 import { convertSubtitleTimeToPlayerTime } from '../../libs/tools';
-// import { RepeatProps } from '../../../types/video';
-import './List.module.css';
-import { RepeatProps } from '../../../types/video';
 import { setRepeat } from '../../libs/reducers/repeatSlice';
+import { createRepeatProps } from '../../../types/video';
+import './List.module.css';
 
 function handleClick(): undefined {
   window.electron.ipcRenderer.sendMessage(
@@ -24,18 +23,6 @@ function listenSelectSubtitle(
     }
   });
 }
-
-const createRepeatProps = (
-  count: number,
-  startTime: number,
-  endTime: number,
-): RepeatProps => {
-  return {
-    count,
-    begin: startTime,
-    end: endTime,
-  };
-};
 
 const listWrapper = (
   subtitles: Array<Array<string>>,
@@ -69,8 +56,6 @@ const listWrapper = (
       if (activeFlag) {
         textCss += ' text-blue-600';
       }
-
-      // const rp1 = createRepeatProps(1, startTime, endTime);
 
       return (
         <div className={rowCss} key={Number(val[0])}>

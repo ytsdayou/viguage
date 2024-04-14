@@ -590,28 +590,12 @@ video {
   position: relative;
 }
 
-.right-4 {
-  right: 1rem;
-}
-
-.top-8 {
-  top: 2rem;
-}
-
-.top-7 {
-  top: 1.75rem;
-}
-
-.right-5 {
-  right: 1.25rem;
+.right-6 {
+  right: 1.5rem;
 }
 
 .top-6 {
   top: 1.5rem;
-}
-
-.right-6 {
-  right: 1.5rem;
 }
 
 .mt-3 {
@@ -680,10 +664,6 @@ video {
 
 .gap-y-5 {
   row-gap: 1.25rem;
-}
-
-.gap-y-3 {
-  row-gap: 0.75rem;
 }
 
 .overflow-auto {
@@ -755,6 +735,11 @@ video {
   line-height: 1rem;
 }
 
+.text-blue-600 {
+  --tw-text-opacity: 1;
+  color: rgb(37 99 235 / var(--tw-text-opacity));
+}
+
 .text-gray-500 {
   --tw-text-opacity: 1;
   color: rgb(107 114 128 / var(--tw-text-opacity));
@@ -768,11 +753,6 @@ video {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
-}
-
-.text-blue-600 {
-  --tw-text-opacity: 1;
-  color: rgb(37 99 235 / var(--tw-text-opacity));
 }
 
 .vll-btn {
@@ -801,8 +781,4 @@ video {
 
 .group\/item:hover .group-hover\/item\:visible {
   visibility: visible;
-}
-
-.group:hover .group-hover\:block {
-  display: block;
 }
