@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import VideoJS from './videojs';
 import { Channels, Events, MsgStatus } from '../../../types/message';
-import { useAppDispatch, useAppSelector } from '../../libs/hooks';
+import { useAppDispatch } from '../../libs/hooks';
 import { setPlayTime } from '../../libs/reducers/playTimeSlice';
-import { selectRepeat } from '../../libs/reducers/repeatSlice';
-import { CallbackObject } from '../../../types/video';
+import { setRepeat } from '../../libs/reducers/repeatSlice';
 
 interface IPlayerProps {
   onUpdateSelect: (selectedValue: boolean) => undefined;
   selectedVideo: boolean;
+  playerRef: React.MutableRefObject<any>;
 }
 
 function handleClick(): undefined {
@@ -18,16 +18,14 @@ function handleClick(): undefined {
 export default function Player({
   selectedVideo,
   onUpdateSelect,
+  playerRef,
 }: IPlayerProps) {
-  const playerRef = useRef<any>(null);
   const [videoJsOptions, setVideoJsOptions] = useState({});
   const dispatch = useAppDispatch();
-  const repeat = useAppSelector(selectRepeat);
 
   const handlePlayerReady = (player: any): undefined => {
     playerRef.current = player;
 
-    // You can handle player events here, for example:
     player.on('waiting', () => {
       // console.log('player is waiting');
     });
@@ -35,19 +33,18 @@ export default function Player({
     player.on('dispose', () => {
       // console.log('player will dispose');
     });
-  };
 
-  const playerListener: CallbackObject = {
-    timeupdate: (player: any) => {
-      const currentTime = player.currentTime();
-      if (
-        repeat.count > 0 &&
-        currentTime &&
-        (currentTime < repeat.begin || currentTime > repeat.end)
-      ) {
-        player.currentTime(repeat.begin);
+    player.on('timeupdate', (e: any) => {
+      if (e.manuallyTriggered) {
+        dispatch(
+          setRepeat({
+            count: 0,
+            begin: 0,
+            end: 0,
+          }),
+        );
       }
-    },
+    });
   };
 
   useEffect(() => {
@@ -74,24 +71,9 @@ export default function Player({
     });
   }, [dispatch, onUpdateSelect]);
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (playerRef && playerRef.current && playerRef.current.currentTime) {
-        dispatch(setPlayTime(playerRef.current.currentTime()));
-      }
-    }, 100);
-
-    return () => clearInterval(intervalId);
-  }, [dispatch]);
-
   const playerBox = () => {
     return selectedVideo ? (
-      <VideoJS
-        options={videoJsOptions}
-        onReady={handlePlayerReady}
-        repeat={repeat}
-        playerListener={playerListener}
-      />
+      <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
     ) : (
       <div className="w-full aspect-video bg-black text-xs text-white flex items-center justify-center">
         Please click the button below to select a video file!
@@ -105,7 +87,6 @@ export default function Player({
       <button type="button" className="vll-btn mt-3" onClick={handleClick}>
         Select Video
       </button>
-      {repeat.count}
     </>
   );
 }

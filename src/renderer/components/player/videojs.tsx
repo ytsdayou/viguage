@@ -7,7 +7,7 @@ import { VideoProps } from '../../../types/video';
 export default function VideoJS(props: VideoProps) {
   const videoRef = React.useRef<HTMLDivElement>(null);
   const playerRef = React.useRef<any>(null);
-  const { options, onReady, repeat, playerListener } = props;
+  const { options, onReady } = props;
 
   React.useEffect(() => {
     let player: any;
@@ -32,34 +32,10 @@ export default function VideoJS(props: VideoProps) {
       player = playerRef.current;
 
       player.src(options.sources);
-
-      // player.off('timeupdate');
-      // player.on('timeupdate', () => {
-      //   const currentTime = player.currentTime();
-
-      //   if (
-      //     repeat.count > 0 &&
-      //     currentTime &&
-      //     (currentTime < repeat.begin || currentTime > repeat.end)
-      //   ) {
-      //     player.currentTime(repeat.begin);
-      //   }
-      // });
-      // playerListener.
-      Object.entries(playerListener).forEach((element: any) => {
-        const [eventName, callback] = element;
-        if (eventName !== 'click') {
-          player.off(eventName);
-          player.on(eventName, (e: any) => {
-            callback(player, e);
-          });
-        }
-      });
-
       player.load();
       player.play();
     }
-  }, [onReady, options, playerListener, repeat, videoRef]);
+  }, [onReady, options, videoRef]);
 
   // Dispose the Video.js player when the functional component unmounts
   React.useEffect(() => {

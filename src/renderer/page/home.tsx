@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Player from '../components/player/player';
 import Subtitle from '../components/subtitle/list';
+import Invisible from '../components/player/invisible';
 
 export default function Home() {
   const [selectedVideo, setSelectedVideo] = useState(false);
+  const playerRef = useRef<any>(null);
 
   const handleSelectVideo = (flag: boolean): undefined => {
     setSelectedVideo(flag);
@@ -15,7 +17,9 @@ export default function Home() {
         <Player
           selectedVideo={selectedVideo}
           onUpdateSelect={handleSelectVideo}
+          playerRef={playerRef}
         />
+        <Invisible playerRef={playerRef} />
       </div>
 
       <div className="basis-2/3">

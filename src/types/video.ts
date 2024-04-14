@@ -9,8 +9,6 @@ export type CallbackObject = {
 export type VideoProps = {
   options: any;
   onReady: any;
-  repeat: RepeatProps;
-  playerListener: CallbackObject;
 };
 
 export const createRepeatProps = (
@@ -18,6 +16,7 @@ export const createRepeatProps = (
   startTime: number,
   endTime: number,
 ): RepeatProps => {
+  console.log(startTime, endTime);
   return {
     count,
     begin: startTime,

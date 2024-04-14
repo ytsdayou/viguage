@@ -71,7 +71,10 @@ const listWrapper = (
             >
               <i className="bi bi-play-btn" />
             </button>
-            <button type="button" onClick={handleClick}>
+            <button
+              type="button"
+              onClick={() => onUpdateRepeat(15, startTime, endTime)}
+            >
               <i className="bi bi-repeat" />
             </button>
           </div>
