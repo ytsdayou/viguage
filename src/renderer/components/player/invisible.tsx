@@ -13,7 +13,7 @@ export default function Invisible({
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      if (playerRef && playerRef.current && playerRef.current.currentTime) {
+      if (playerRef?.current?.currentTime) {
         const currentTime = playerRef.current.currentTime();
         dispatch(setPlayTime(currentTime));
 
@@ -22,11 +22,11 @@ export default function Invisible({
           currentTime &&
           (currentTime < repeat.begin || currentTime > repeat.end)
         ) {
-          console.log(
-            currentTime,
-            repeat,
-            currentTime < repeat.begin || currentTime > repeat.end,
-          );
+          // console.log(
+          //   currentTime,
+          //   repeat,
+          //   currentTime < repeat.begin || currentTime > repeat.end,
+          // );
           playerRef.current.currentTime(repeat.begin);
           dispatch(
             setRepeat({

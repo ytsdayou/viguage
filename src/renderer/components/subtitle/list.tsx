@@ -64,15 +64,19 @@ const listWrapper = (
             <div className="text-xs text-gray-500">{end}</div>
           </div>
           <div className={textCss}>{textWrapper}</div>
-          <div className="absolute opt top-6 right-6 flex flex-col invisible group-hover/item:visible">
+          <div className="absolute opt top-4 right-6 flex flex-col invisible group-hover/item:visible">
             <button
               type="button"
+              className="p-1 rounded-full text-blue-700 hover:bg-gray-200"
+              title="Play this sentence"
               onClick={() => onUpdateRepeat(1, startTime, endTime)}
             >
               <i className="bi bi-play-btn" />
             </button>
             <button
               type="button"
+              className="p-1 rounded-full text-blue-700 hover:bg-gray-200"
+              title="Repeat this sentence 15 times"
               onClick={() => onUpdateRepeat(15, startTime, endTime)}
             >
               <i className="bi bi-repeat" />
