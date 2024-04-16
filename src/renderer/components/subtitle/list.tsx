@@ -5,6 +5,7 @@ import { selectPlayTime } from '../../libs/reducers/playTimeSlice';
 import { convertSubtitleTimeToPlayerTime } from '../../libs/tools';
 import { setRepeat } from '../../libs/reducers/repeatSlice';
 import { createRepeatProps } from '../../../types/video';
+import Switch from '../elements/switch';
 import './List.module.css';
 
 function handleClick(): undefined {
@@ -24,7 +25,7 @@ function listenSelectSubtitle(
   });
 }
 
-const listWrapper = (
+const ListWrapper = (
   subtitles: Array<Array<string>>,
   playTime: number,
   activeId: number,
@@ -95,6 +96,7 @@ const listWrapper = (
 export default function List() {
   const [subtitles, setSubtitles] = useState([]);
   const [activeId, setActiveId] = useState(0);
+  const [autoScroll, setAutoScroll] = useState(true);
   const listRef = useRef<any>(null);
   const dispatch = useAppDispatch();
   const playTime = useAppSelector(selectPlayTime);
@@ -105,6 +107,10 @@ export default function List() {
 
   const onUpdateSubtitle = (sub: []): undefined => {
     setSubtitles(sub);
+  };
+
+  const onUpdateAutoScroll = (): undefined => {
+    setAutoScroll(!autoScroll);
   };
 
   const onUpdateRepeat = useCallback(
@@ -122,22 +128,26 @@ export default function List() {
   useEffect(() => {
     if (listRef.current && listRef.current.children) {
       const element = listRef.current.children[activeId];
-      if (element) {
+      if (autoScroll && element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'end' });
       }
     }
-  }, [activeId, listRef]);
+  }, [activeId, autoScroll, listRef]);
 
   return (
     <div className="border border-slate-200 bg-white text-sm h-full flex flex-col">
-      <div className="p-3 border-b border-slate-200">
+      <div className="p-3 border-b border-slate-200 flex justify-between items-center">
         <button type="button" className="vll-btn" onClick={handleClick}>
           Select Subtitle
         </button>
+        <div className="flex items-center">
+          <Switch active={autoScroll} onUpdateActive={onUpdateAutoScroll} />
+          <span className="text-gray-600 ml-2">auto scroll</span>
+        </div>
       </div>
       {subtitles.length > 0 ? (
         <div ref={listRef} className="overflow-auto">
-          {listWrapper(
+          {ListWrapper(
             subtitles,
             playTime,
             activeId,
