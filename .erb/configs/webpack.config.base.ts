@@ -4,6 +4,7 @@
 
 import webpack from 'webpack';
 import TsconfigPathsPlugins from 'tsconfig-paths-webpack-plugin';
+import path from 'path';
 import webpackPaths from './webpack.paths';
 import { dependencies as externals } from '../../release/app/package.json';
 
@@ -28,6 +29,21 @@ const configuration: webpack.Configuration = {
           },
         },
       },
+      // {
+      //   test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+      //   include: path.resolve(
+      //     webpackPaths.rootPath,
+      //     './node_modules/bootstrap-icons/font/fonts',
+      //   ),
+      //   use: {
+      //     loader: 'file-loader',
+      //     options: {
+      //       name: '[name].[ext]',
+      //       outputPath: 'bootstrap-icon',
+      //       publicPath: '../bootstrap-icon',
+      //     },
+      //   },
+      // },
     ],
   },
 
