@@ -51,7 +51,6 @@ export default function Player({
     // calling IPC exposed from preload script
     window.electron.ipcRenderer.on(Events.DialogOpenFile, (e) => {
       if (e.status === MsgStatus.SUCC) {
-        onUpdateSelect(false);
         setVideoJsOptions({
           autoplay: true,
           controls: true,

@@ -164,8 +164,8 @@
     "webpack-merge": "^5.9.0"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "Viguage",
+    "appId": "org.erb.Viguage",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -223,8 +223,8 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "video-learn-language",
+      "repo": "video-learn-language"
     }
   },
   "collective": {

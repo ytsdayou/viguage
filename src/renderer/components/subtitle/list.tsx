@@ -157,8 +157,8 @@ export default function List() {
         </div>
       ) : (
         <div className="flex-grow flex items-center justify-center text-xs text-slate-500">
-          Please click the button below to select a subtitle file(support: srt,
-          ass)!
+          Please click the button up here to select a subtitle file(support:
+          srt, ass)!
         </div>
       )}
     </div>

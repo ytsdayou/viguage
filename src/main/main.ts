@@ -14,7 +14,6 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { msgHandle } from './ipc/handle';
 import { Events, MsgStatus } from '../types/message';
 import { streamVideo } from './ipc/server';
 import ParseSubtitle from './ipc/subtitle';
@@ -79,8 +78,10 @@ ipcMain.on('ipc-channel', async (event, arg: Events) => {
         });
       });
   } else {
-    const ret = msgHandle(arg);
-    event.reply(ret.event, ret.data);
+    event.reply(arg, {
+      status: MsgStatus.ERROR,
+      message: `unexpected message to main process`,
+    });
   }
 });
 
