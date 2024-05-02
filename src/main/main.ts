@@ -41,7 +41,7 @@ ipcMain.on('ipc-channel', async (event, arg: Events) => {
 
     const dialogExten = new Map();
     dialogExten.set(Events.DialogOpenFile, ['mp4']);
-    dialogExten.set(Events.DialogOpenSubtitle, ['srt', 'ass', 'vtt']);
+    dialogExten.set(Events.DialogOpenSubtitle, ['srt']);
 
     dialog
       .showOpenDialog(mainWindow as BrowserWindow, {

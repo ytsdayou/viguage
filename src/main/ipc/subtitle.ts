@@ -1,35 +1,27 @@
+import { parseSync, formatTimestamp } from 'subtitle';
 import { MsgStatus } from '../../types/message';
 
 const fs = require('fs');
-const { convert } = require('subtitle-converter');
 
-function groupSubtitlesByTime(vttContent: string) {
-  const tmp = vttContent.split('\r\n\r\n');
-  const subtitles = tmp.map((block: string) => {
-    return block.split('\r\n');
+function groupSubtitlesByTime(vttContent: any) {
+  // const tmp = vttContent.split('\r\n\r\n');
+  const subtitles = vttContent.map((block: any, index: number) => {
+    return [
+      index,
+      formatTimestamp(block.data.start),
+      formatTimestamp(block.data.end),
+      ...block.data.text.split('\n'),
+    ];
   });
   return subtitles;
 }
 
 export default function ParseSubtitle(filepath: string) {
   const subtitleText = fs.readFileSync(filepath, 'utf-8');
-  const outputExtension = '.srt'; // conversion is based on output file extension
-  const options = {
-    removeTextFormatting: true,
-    timecodeOverlapLimiter: 1,
-  };
-
-  const { subtitle, status } = convert(subtitleText, outputExtension, options);
-
-  if (status.success) {
-    return {
-      status: MsgStatus.SUCC,
-      message: groupSubtitlesByTime(subtitle),
-      // message: subtitle,
-    };
-  }
+  const sections = parseSync(subtitleText);
   return {
-    status: MsgStatus.ERROR,
-    message: status,
+    status: MsgStatus.SUCC,
+    message: groupSubtitlesByTime(sections),
+    // message: sections,
   };
 }

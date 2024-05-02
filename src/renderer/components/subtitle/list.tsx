@@ -33,12 +33,11 @@ const ListWrapper = (
   onUpdateRepeat: (count: number, begin: number, end: number) => void,
 ) => {
   const listContent = subtitles.map((val: string[], i: number) => {
-    if ([3, 4].indexOf(val.length) > -1) {
-      const [start, end] = val[1].split(' --> ');
-      const startTime = convertSubtitleTimeToPlayerTime(start);
-      const endTime = convertSubtitleTimeToPlayerTime(end);
+    if ([4, 5].indexOf(val.length) > -1) {
+      const startTime = convertSubtitleTimeToPlayerTime(val[1]);
+      const endTime = convertSubtitleTimeToPlayerTime(val[2]);
 
-      const text = val[3] ? [val[2], val[3]] : [val[2]];
+      const text = val[4] ? [val[3], val[4]] : [val[3]];
       const textWrapper = text.map((textRow: string, index: number) => {
         return <div key={`${val[0]}_${index.toString()}`}>{textRow}</div>;
       });
@@ -61,15 +60,17 @@ const ListWrapper = (
       return (
         <div className={rowCss} key={Number(val[0])}>
           <div className="row-left flex flex-col justify-between gap-y-5 px-4">
-            <div className="text-xs text-gray-500">{start}</div>
-            <div className="text-xs text-gray-500">{end}</div>
+            <div className="text-xs text-gray-500">{val[1]}</div>
+            <div className="text-xs text-gray-500">{val[2]}</div>
           </div>
           <div className={textCss}>{textWrapper}</div>
           <div className="absolute opt top-4 right-6 flex flex-col invisible group-hover/item:visible">
             <button
               type="button"
+              data-tooltip-id="my-tooltip"
+              data-tooltip-content="Play this sentence"
+              data-tooltip-place="top"
               className="p-1 rounded-full text-blue-700 hover:bg-gray-200"
-              title="Play this sentence"
               onClick={() => onUpdateRepeat(1, startTime, endTime)}
             >
               <i className="bi bi-play-btn" />
@@ -158,7 +159,7 @@ export default function List() {
       ) : (
         <div className="flex-grow flex items-center justify-center text-xs text-slate-500">
           Please click the button up here to select a subtitle file(support:
-          srt, ass)!
+          srt)!
         </div>
       )}
     </div>
