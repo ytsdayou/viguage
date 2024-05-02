@@ -1,6 +1,8 @@
 <p>
-  This is an application designed for foreign language learners, allowing them to easily repeat sentences to practice and enhance their listening skills, uses <a href="https://github.com/electron-react-boilerplate/electron-react-boilerplate">Electron React Boilerplate</a>, <a href="https://electron.atom.io/">Electron</a>, <a href="https://facebook.github.io/react/">React</a>, <a href="https://github.com/reactjs/react-router">React Router</a>, <a href="https://webpack.js.org/">Webpack</a> and <a href="https://www.npmjs.com/package/react-refresh">React Fast Refresh</a>.
+  This is an application designed for foreign language learners, allowing them to easily repeat sentences to practice and enhance their listening skills, uses <a href="https://github.com/electron-react-boilerplate/electron-react-boilerplate">Electron React Boilerplate</a>, <a href="https://tailwindcss.com/">tailwindcss</a>, <a href="https://github.com/gsantiago/subtitle.js">subtitle.js</a>, <a href="https://redux.js.org/">Redux</a> and <a href="https://videojs.com/">Videojs</a>.
 </p>
+
+![Screenshot](./assets/screenshot/repeat.png)
 
 ## Install
 
